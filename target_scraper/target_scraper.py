@@ -13,7 +13,7 @@ from utils import get_category_links, page_scroll, get_eligible_links, get_page_
 logging.basicConfig(filename='log_app.log',
                     format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p',
-                    level=logging.ERROR)
+                    level=logging.DEBUG)
 
 
 #Getting To Categories Page

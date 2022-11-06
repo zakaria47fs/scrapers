@@ -57,6 +57,7 @@ def page_scroll(driver):
         driver.execute_script(f"window.scrollTo(0,{hight})")
         time.sleep(0.5)
         hight += 100
+    return driver
         
 
 def get_page_links(driver, wait):
@@ -75,19 +76,7 @@ def get_page_links(driver, wait):
 
 
 def product_get_info(driver, wait, primary_category,sub_category):
-    try:
-        new_price = wait.until(EC.visibility_of_element_located((By.XPATH, "//span[@data-test='product-price']")))
-        new_price = new_price.text
-    except:
-        new_price = ''
-    
-    try:
-        old_price = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@data-test="product-regular-price"]')))
-        old_price = old_price.text
-        old_price = old_price.replace('reg ','')
-    except:
-        old_price = ''
-        
+
     try:
         show_more = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@data-test='toggleContentButton']")))
         show_more.click()
@@ -96,9 +85,22 @@ def product_get_info(driver, wait, primary_category,sub_category):
         description = description.text[:350]
     except:
         description = ''
+
+    try:
+        new_price = driver.find_element(By.XPATH, "//span[@data-test='product-price']")
+        new_price = new_price.text
+    except:
+        new_price = ''
     
     try:
-        product_title = wait.until(EC.visibility_of_element_located((By.XPATH, "//h1[@data-test='product-title']")))
+        old_price = driver.find_element(By.XPATH, '//*[@data-test="product-regular-price"]')
+        old_price = old_price.text
+        old_price = old_price.replace('reg ','')
+    except:
+        old_price = ''
+        
+    try:
+        product_title = driver.find_element(By.XPATH, "//h1[@data-test='product-title']")
         product_title = product_title.text
     except:
         product_title = ''
@@ -109,14 +111,14 @@ def product_get_info(driver, wait, primary_category,sub_category):
         link_url = ''
     
     try:
-        product_brand = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[starts-with(., "Shop all ")]')))
+        product_brand = driver.find_element(By.XPATH, '//*[starts-with(., "Shop all ")]')
         product_brand = product_brand.text.split()
         product_brand = ' '.join(product_brand[2:])
     except:
         product_brand =''
     
     try:
-        thumbnail = wait.until(EC.visibility_of_element_located((By.XPATH,'//button[@data-test="product-carousel-thumb-0"]//img')))
+        thumbnail = driver.find_element(By.XPATH,'//button[@data-test="product-carousel-thumb-0"]//img')
         thumbnail = thumbnail.get_attribute('src')
     except:
         thumbnail =''
@@ -125,10 +127,9 @@ def product_get_info(driver, wait, primary_category,sub_category):
     df.loc[len(df.index)] = products_info
     df.to_csv('target_scraping.csv',index=False)
 
-
     
 def scrap_page(driver, wait):
-    page_scroll(driver)
+    driver = page_scroll(driver)
     items_links = []
     wait.until(EC.visibility_of_element_located((By.XPATH,"//a[@data-test='product-title']")))
     page_source = driver.page_source
@@ -140,8 +141,10 @@ def scrap_page(driver, wait):
     return items_links
 
 def get_category_links(driver,wait):
+    time.sleep(2)  # wait page to refresh
     wait.until(EC.visibility_of_element_located((By.XPATH,'/html/body/div[3]/main/div[2]/div/section/div[2]/ul/li/div/div/a')))
-    page_scroll(driver)
+    driver = page_scroll(driver)
+    wait.until(EC.visibility_of_element_located((By.XPATH,'/html/body/div[3]/main/div[2]/div/section/div[2]/ul/li/div/div/a')))
     page_source = driver.page_source
     category_links = []
     soup = BeautifulSoup(page_source, 'lxml')
