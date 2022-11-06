@@ -3,52 +3,46 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import logging
-
-from utils import Page_Scroll, Get_Eligible_Links, Get_Page_Links, Scrap_Page, open_browser
+import numpy as np
+from bs4 import BeautifulSoup
+import pandas as pd
+from utils import get_category_links, page_scroll, get_eligible_links, get_page_links, scrap_page, open_browser, product_get_info
 
 
 # logging configuration
 logging.basicConfig(filename='log_app.log',
                     format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p',
-                    level=logging.DEBUG)
+                    level=logging.ERROR)
 
 
 #Getting To Categories Page
-driver, wait = open_browser()
+driver, wait = open_browser(driver_path='chromedriver')
 
 #----------------------------------
 #Scraping Categories Links And filling Category_links ARRAY  
-Category_links=[]
-Page_Scroll(driver)
-Categories = wait.until(EC.visibility_of_element_located((By.XPATH,'/html/body/div[3]/main/div[2]/div/section/div[2]/ul/li/div/div/a')))
-Categories = driver.find_elements(By.XPATH,'/html/body/div[3]/main/div[2]/div/section/div[2]/ul/li/div/div/a')
-for Category in range(0,len(Categories)-1):
-    #sometime the page reload so we need to get Categories every time
-    Categories = wait.until(EC.visibility_of_element_located((By.XPATH,'/html/body/div[3]/main/div[2]/div/section/div[2]/ul/li/div/div/a')))
-    Categories = driver.find_elements(By.XPATH,'/html/body/div[3]/main/div[2]/div/section/div[2]/ul/li/div/div/a')
-    Category_id = Categories[Category].get_attribute('id')
-    Category_links.append(driver.current_url+ '''&category_tree_id='''+Category_id.split('-')[1])
-
-for Category_link in Category_links:
-    driver.get(Category_link)
+category_links = get_category_links(driver,wait)
+for category_link in category_links:
+    driver.get(category_link)
     try:
-        Primary_Category=wait.until(EC.visibility_of_element_located((By.XPATH,'//*[starts-with(., "shop ")]')))
-        Primary_Category=' '.join(Primary_Category.text.split()[1:])
+        primary_category = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[starts-with(., "shop ")]')))
+        primary_category = ' '.join(primary_category.text.split()[1:])
     except:
-        Primary_Category=''
-    driver, Eligible_Links = Get_Eligible_Links(driver, wait)
-    for Eligible_Link in Eligible_Links:
-        driver.get(Eligible_Link)
+        primary_Category = ''
+    driver, eligible_links, sub_category = get_eligible_links(driver, wait)
+    for eligible_link in eligible_links:
+        driver.get(eligible_link)
         try:
-            Show_all = wait.until(EC.element_to_be_clickable((By.XPATH,"//a[text()='Show all']")))
-            Show_all_url=Show_all.get_attribute('href')
-            driver.get(Show_all_url)
+            show_all = wait.until(EC.element_to_be_clickable((By.XPATH,"//a[text()='Show all']")))
+            show_all_url = show_all.get_attribute('href')
+            driver.get(show_all_url)
         except:
             pass
-        Page_Links = Get_Page_Links(driver, wait)
-    for link in Page_Links:
-        driver.get(link)
-        Scrap_Page(driver, wait, Primary_Category)
-
-
+        page_links = get_page_links(driver, wait)
+        items_links = []
+        for link in page_links:
+            driver.get(link)
+            items_links=items_links+scrap_page(driver, wait)
+        for item_link in items_links:
+            driver.get(item_link)
+            product_get_info(driver,wait, primary_category,sub_category)
