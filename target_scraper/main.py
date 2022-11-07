@@ -1,12 +1,9 @@
-from selenium import webdriver as wd
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import logging
-import numpy as np
-from bs4 import BeautifulSoup
-import pandas as pd
-from utils import get_category_links, page_scroll, get_eligible_links, get_page_links, scrap_page, open_browser, product_get_info
+
+from utils import get_category_links, get_eligible_links, get_page_links, scrap_page, open_browser, product_get_info
+from mongo_service import MongoService
 
 
 # logging configuration
@@ -15,13 +12,15 @@ logging.basicConfig(filename='log_app.log',
                     datefmt='%m/%d/%Y %I:%M:%S %p',
                     level=logging.DEBUG)
 
+mongo_service = MongoService()
+collection_name = 'target_db'
+
 
 #Getting To Categories Page
-driver, wait = open_browser(driver_path='chromedriver')
+driver, wait = open_browser(driver_path='chromedriver --max_old_space_size=4096')
 
-#----------------------------------
 #Scraping Categories Links And filling Category_links ARRAY  
-category_links = get_category_links(driver,wait)
+category_links = get_category_links(driver, wait)
 for category_link in category_links:
     driver.get(category_link)
     try:
@@ -44,5 +43,8 @@ for category_link in category_links:
             driver.get(link)
             items_links=items_links+scrap_page(driver, wait)
         for item_link in items_links:
+            logging.info('Scrape product: {}'.format(item_link))
             driver.get(item_link)
-            product_get_info(driver,wait, primary_category,sub_category)
+            product_data = product_get_info(driver,wait, primary_category,sub_category)
+            # push product info to DB
+            mongo_service.add_one_db(collection_name, product_data)
