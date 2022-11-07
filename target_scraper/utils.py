@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 def open_browser(driver_path):
     logging.info('Start browser')
     options = wd.ChromeOptions()
-    options.add_argument('--headless')
+    #options.add_argument('--headless')
     driver = wd.Chrome(driver_path, chrome_options=options)
     url = "https://weeklyad.target.com"
     driver.get(url)
