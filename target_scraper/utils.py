@@ -15,7 +15,7 @@ def open_browser(driver_path):
     url = "https://weeklyad.target.com"
     driver.get(url)
     driver.maximize_window()
-    wait = WebDriverWait(driver,10)
+    wait = WebDriverWait(driver,5) 
     view_the_weekly_ad=wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='View the Weekly Ad']")))
     view_the_weekly_ad_url=driver.current_url[:-1]+view_the_weekly_ad.get_attribute('href')
     driver.get(view_the_weekly_ad_url)
@@ -49,13 +49,13 @@ def get_eligible_links(driver, wait):
         
 def page_scroll(driver):
     "Scroll to the Bottom of Page"
-    hight = 100
+    hight = 300 
     page_hight = driver.execute_script("return document.body.scrollHeight")
     while hight<page_hight:
         page_hight = driver.execute_script("return document.body.scrollHeight")
         driver.execute_script(f"window.scrollTo(0,{hight})")
         time.sleep(0.5)
-        hight += 100
+        hight += 300 
     return driver
         
 
