@@ -15,7 +15,7 @@ def open_browser(driver_path):
     url = "https://weeklyad.target.com"
     driver.get(url)
     driver.maximize_window()
-    wait = WebDriverWait(driver,20)
+    wait = WebDriverWait(driver,10)
     view_the_weekly_ad=wait.until(EC.element_to_be_clickable((By.XPATH,"//button[text()='View the Weekly Ad']")))
     view_the_weekly_ad_url=driver.current_url[:-1]+view_the_weekly_ad.get_attribute('href')
     driver.get(view_the_weekly_ad_url)
@@ -38,7 +38,9 @@ def get_eligible_links(driver, wait):
         eligible_item.click()
         Tab = driver.window_handles[1]
         driver.switch_to.window(Tab)
-        eligible_links.append(driver.current_url)
+        link = driver.current_url
+        if link not in eligible_links:
+            eligible_links.append(link)
         driver.close()
         Tab = driver.window_handles[0]
         driver.switch_to.window(Tab)
@@ -127,7 +129,7 @@ def product_get_info(driver, wait, primary_category, sub_category):
     return product_info
 
 
-def scrap_page(driver, wait):
+def scrap_page(driver):
     driver = page_scroll(driver)
     items_links = []
     page_source = driver.page_source
@@ -149,5 +151,5 @@ def get_category_links(driver,wait):
     categories_list = soup.find('div', class_="category-tiles")
     categories_links = categories_list.find_all('a', class_="ng-binding")
     for category in categories_links:
-        category_links.append(driver.current_url+ '''&category_tree_id='''+category['id'].split('-')[-1])
-    return  category_links
+        category_links.append(driver.current_url+ '''&category_tree_id=''' + category['id'].split('-')[-1])
+    return category_links

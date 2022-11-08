@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-import configuration as cfg
+from services import configuration as cfg
 import logging
 
 
@@ -42,3 +42,10 @@ class MongoService:
 
     def filter_data_db(self, collection_name, filter):
         return self._database[collection_name].find(filter)
+
+    def update_by_link(self, collection_name, data):
+        self._database[collection_name].update_one(
+                                            {"link_url": data.get('link_url')},
+                                            {"$set": data},
+                                            upsert=True
+                                        )
