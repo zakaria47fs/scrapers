@@ -1,9 +1,0 @@
-11/08/2022 01:06:02 AM INFO root MainThread : Start browser
-11/08/2022 01:06:21 AM INFO root MainThread : scraping category https://weeklyad.target.com/categories?code=Target-20221106&category_tree_id=5118570
-11/08/2022 01:08:16 AM INFO root MainThread : scraping eligible link https://www.target.com/pl/799995990?marketing_id=1090-2847802706963749
-11/08/2022 01:09:39 AM INFO root MainThread : Start browser
-11/08/2022 01:10:13 AM INFO root MainThread : scraping category https://weeklyad.target.com/categories?code=Target-20221106&category_tree_id=5118570
-11/08/2022 01:11:49 AM INFO root MainThread : scraping eligible link https://www.target.com/pl/799995990?marketing_id=2272-2847802706963749
-11/08/2022 01:12:12 AM INFO root MainThread : all_item_links length: 1
-11/08/2022 01:12:12 AM INFO root MainThread : duplicate https://www.target.com/p/all-ultra-free-clear-he-liquid-laundry-detergents/-/A-79386368?preselect=13219348#lnk=sametab
-11/08/2022 01:12:12 AM INFO root MainThread : scraping eligible link https://www.target.com/pl/167832516?marketing_id=2272-2847795066951184
