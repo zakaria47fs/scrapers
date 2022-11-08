@@ -1,3 +1,5 @@
 */chromedriver
+*/chromedriver.exe
 */log_app.log
-configuration.py
+log_app.log
+#configuration.py
