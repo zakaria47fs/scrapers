@@ -36,7 +36,6 @@ if __name__=='__main__':
         except:
             primary_Category = ''
         driver, eligible_links, sub_category = get_eligible_links(driver, wait)
-        all_eligible_links.extend(eligible_links)
             
         for eligible_link in eligible_links:
             
@@ -78,3 +77,5 @@ if __name__=='__main__':
                 mongo_service.update_by_link(collection_name, product_data)
 
             logging.info('all_item_links length: {}'.format(len(all_item_links)))
+
+    logging.info("End process")
