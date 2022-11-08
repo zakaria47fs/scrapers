@@ -25,6 +25,8 @@ if __name__=='__main__':
     #Scraping Categories Links And filling Category_links ARRAY  
     category_links = get_category_links(driver, wait)
     all_item_links = []
+    all_eligible_links = []
+    
     for category_link in category_links:
         logging.info('scraping category {}'.format(category_link))
         driver.get(category_link)
@@ -34,7 +36,17 @@ if __name__=='__main__':
         except:
             primary_Category = ''
         driver, eligible_links, sub_category = get_eligible_links(driver, wait)
+        all_eligible_links.extend(eligible_links)
+            
         for eligible_link in eligible_links:
+            
+            # filter duplicates
+            if eligible_link in all_eligible_links:
+                logging.info("duplicate eligible_link {}".format(eligible_link))
+                continue
+            else:
+                all_eligible_links.append(eligible_link)
+
             logging.info('scraping eligible link {}'.format(eligible_link))
             driver.get(eligible_link)
             try:
@@ -48,9 +60,6 @@ if __name__=='__main__':
             for link in page_links:
                 driver.get(link)
                 items_links=items_links+scrap_page(driver, wait)
-                all_item_links.extend(items_links)
-                all_item_links = list(set(all_item_links))
-                logging.info('all_item_links length: {}'.format(len(all_item_links)))
 
             #filter duplicates
             filtred_items_links = []
@@ -59,6 +68,7 @@ if __name__=='__main__':
                     logging.info("duplicate {}".format(item))
                 else:
                     filtred_items_links.append(item)
+                    all_item_links.append(item)
 
             for item_link in filtred_items_links:
                 logging.info('Scrape product: {}'.format(item_link))
@@ -66,3 +76,5 @@ if __name__=='__main__':
                 product_data = product_get_info(driver,wait, primary_category,sub_category)
                 # push product info to DB
                 mongo_service.update_by_link(collection_name, product_data)
+
+            logging.info('all_item_links length: {}'.format(len(all_item_links)))
