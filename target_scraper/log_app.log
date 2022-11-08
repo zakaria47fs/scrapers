@@ -1,0 +1,3 @@
+11/08/2022 01:06:02 AM INFO root MainThread : Start browser
+11/08/2022 01:06:21 AM INFO root MainThread : scraping category https://weeklyad.target.com/categories?code=Target-20221106&category_tree_id=5118570
+11/08/2022 01:08:16 AM INFO root MainThread : scraping eligible link https://www.target.com/pl/799995990?marketing_id=1090-2847802706963749

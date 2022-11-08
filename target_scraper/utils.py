@@ -129,7 +129,7 @@ def product_get_info(driver, wait, primary_category, sub_category):
     return product_info
 
 
-def scrap_page(driver):
+def scrap_page(driver, wait):
     driver = page_scroll(driver)
     items_links = []
     page_source = driver.page_source
