@@ -65,11 +65,15 @@ def get_page_links(driver, wait):
     items_num = int(items_num.text.split()[0])
     link = driver.current_url
     links.append(link)
+    if items_num//24 >20:
+        pages_num = 20
+    else:
+        pages_num = items_num//24
     if '?' in link:
-        for i in range(1,1+items_num//24):
+        for i in range(1,pages_num):
             links.append(link+f'&Nao={i*24}&moveTo=product-list-grid')
     else:
-        for i in range(1,1+items_num//24):
+        for i in range(1,pages_num):
             links.append(link+f'?Nao={i*24}&moveTo=product-list-grid')
     return links
 
