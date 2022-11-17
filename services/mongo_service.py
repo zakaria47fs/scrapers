@@ -15,14 +15,14 @@ class MongoService:
             uri = "mongodb://%s:%s" % (host, port)
             mongo_client = MongoClient(uri, connect=False)
             self._database = mongo_client[database_name]
-                    
+
         except Exception as ex:
             logging.error(ex)
 
     def add_one_db(self, collection_name, data):
         self._database[collection_name].insert_one(data)
 
-    def add_many_db(self, collection_name, list_data): # list_data: list  of dicts/objects
+    def add_many_db(self, collection_name, list_data):  # list_data: list  of dicts/objects
         self._database[collection_name].insert_many(list_data)
 
     def get_one_db(self, collection_name, profile_id):
@@ -33,9 +33,9 @@ class MongoService:
 
     def update_one_db(self, collection_name, profile_id, data):
         self._database[collection_name].update_one(
-                                            {"_id": profile_id},
-                                            {"$set": data}
-                                        )
+            {"_id": profile_id},
+            {"$set": data}
+        )
 
     def remove_one_db(self, collection_name, profile_id):
         self._database[collection_name].delete_one({"_id": profile_id})
@@ -43,9 +43,13 @@ class MongoService:
     def filter_data_db(self, collection_name, filter):
         return self._database[collection_name].find(filter)
 
+    def filter_by_keywords_db(self, collection_name, keywords):
+        self._database[collection_name].create_index([("product_title", "text"), ("description", "text")])
+        return self._database[collection_name].find({"$text": {"$search": keywords}})
+
     def update_by_link(self, collection_name, data):
         self._database[collection_name].update_one(
-                                            {"link_url": data.get('link_url')},
-                                            {"$set": data},
-                                            upsert=True
-                                        )
+            {"link_url": data.get('link_url')},
+            {"$set": data},
+            upsert=True
+        )
