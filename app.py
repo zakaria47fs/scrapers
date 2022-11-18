@@ -19,10 +19,10 @@ mongo_service = MongoService()
 collection_name = 'target_db'
 
 
-@app.get("/target_deals", response_model=List[DataObject])
+@app.get("/target_deals/{skip}/{limit}", response_model=List[DataObject])
 @authorize_user
-def get_deals(request: Request):
-    data = mongo_service.get_all_db(collection_name)
+def get_deals(skip, limit, request: Request):
+    data = mongo_service.get_all_db(collection_name, int(skip), int(limit))
     return list(data)
 
 
@@ -36,7 +36,7 @@ def get_product_id(id_item, request: Request):
 @app.get("/categories", response_model=List[DataCategory])
 @authorize_user
 def get_categories(request: Request):
-    data = mongo_service.get_all_db(collection_name)
+    data = mongo_service.get_all_cat_db(collection_name)
     return list(data)
 
 

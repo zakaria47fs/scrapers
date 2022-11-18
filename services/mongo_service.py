@@ -28,7 +28,10 @@ class MongoService:
     def get_one_db(self, collection_name, profile_id):
         return self._database[collection_name].find_one({"_id": profile_id})
 
-    def get_all_db(self, collection_name):
+    def get_all_db(self, collection_name, skip, limit):
+        return self._database[collection_name].find({}).skip(skip).limit(limit)
+
+    def get_all_cat_db(self, collection_name):
         return self._database[collection_name].find({})
 
     def update_one_db(self, collection_name, profile_id, data):
