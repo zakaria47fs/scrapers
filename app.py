@@ -19,10 +19,10 @@ mongo_service = MongoService()
 collection_name = 'target_db'
 
 
-@app.get("/target_deals/{skip}/{limit}", response_model=List[DataObject])
+@app.get("/target_deals", response_model=List[DataObject])
 @authorize_user
-def get_deals(skip, limit, request: Request):
-    data = mongo_service.get_all_db(collection_name, int(skip), int(limit))
+def get_deals(request: Request, skip: int = 0, limit: int = 0):
+    data = mongo_service.get_all_db(collection_name, skip, limit)
     return list(data)
 
 
