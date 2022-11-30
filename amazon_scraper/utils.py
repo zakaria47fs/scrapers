@@ -91,8 +91,10 @@ def get_product_data(driver):
     except:
         primary_category = ''
         sub_category = ''
-    product_data =[primary_category, sub_category, product_title,product_brand,old_price,new_price,link_url,thumbnail,description]
-    return driver,product_data
+    product_info = {'primary_category': primary_category, 'sub_category': sub_category, 'product_title': product_title,
+                    'product_brand': product_brand, 'old_price': old_price,'new_price': new_price, 'link_url': link_url,
+                    'thumbnail': thumbnail, 'description': description}
+    return driver,product_info
 
 def get_pages_link(driver):
     pagelinks=[]
