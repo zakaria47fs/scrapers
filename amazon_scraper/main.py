@@ -4,7 +4,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from utils import get_pages_link,get_product_data,get_products_link,open_browser
-import pandas as pd
 import logging
 
 from services.mongo_service import MongoService

@@ -41,7 +41,7 @@ def get_categories(request: Request):
     return list(data)
 
 
-@app.get("/target/products_category", response_model=List[DataObject])
+@app.post("/target/products_category", response_model=List[DataObject])
 @authorize_user
 def get_product_category(item: UserCategory, request: Request):
     filter_ = {"primary_category": {"$in": item.categories}}
@@ -49,7 +49,7 @@ def get_product_category(item: UserCategory, request: Request):
     return list(data)
 
 
-@app.get("/target/products_keyword", response_model=List[DataObject])
+@app.post("/target/products_keyword", response_model=List[DataObject])
 @authorize_user
 def get_product_keywords(item: UserKeywords, request: Request):
     data = mongo_service.filter_by_keywords_db(target_collection, item.keywords)
@@ -77,7 +77,7 @@ def get_categories(request: Request):
     return list(data)
 
 
-@app.get("/amazon/products_category", response_model=List[DataObject])
+@app.post("/amazon/products_category", response_model=List[DataObject])
 @authorize_user
 def get_product_category(item: UserCategory, request: Request):
     filter_ = {"primary_category": {"$in": item.categories}}
@@ -85,7 +85,7 @@ def get_product_category(item: UserCategory, request: Request):
     return list(data)
 
 
-@app.get("/amazon/products_keyword", response_model=List[DataObject])
+@app.post("/amazon/products_keyword", response_model=List[DataObject])
 @authorize_user
 def get_product_keywords(item: UserKeywords, request: Request):
     data = mongo_service.filter_by_keywords_db(amazon_collection, item.keywords)
