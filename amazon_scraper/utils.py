@@ -37,7 +37,14 @@ def get_product_data(driver):
         new_price = '$'+new_price_list[2]+'$'+new_price_list[3]    
     
     try:
-        thumbnail = soup.find(id="landingImage")['src']
+        thumbnail = soup.find(id="landingImage")
+        if thumbnail != None:
+            thumbnail = thumbnail['src']
+        else:
+            thumbnail = soup.find(id="unrolledImgNo0")
+            if thumbnail != None:
+                img = soup.find("img")
+                thumbnail = img['src'] 
     except:
         thumbnail = ''
     try:
@@ -95,13 +102,12 @@ def get_product_data(driver):
 
 def get_pages_link(driver):
     pagelinks=[]
-    pageurl = driver.current_url
-    pagesurl = pageurl.split('A0')
+    pagelinks=[]
     pagenum = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH,"/html/body/div[1]/div[21]/div/div/div/div[3]/div/ul/li[2]")))
     pagenum = pagenum.get_attribute("aria-label")
     pagenum = int(pagenum.split('of ')[-1])
     for i in range(pagenum):
-        pagelinks.append(pagesurl[0]+'A'+str(i)+pagesurl[1])
+        pagelinks.append(f"https://www.amazon.com/deals?ref_=nav_cs_gb&deals-widget=%257B%2522version%2522%253A1%252C%2522viewIndex%2522%253A{60*i}%252C%2522presetId%2522%253A%2522AB48D68973BA06D9DFD05723DA760601%2522%252C%2522discountRanges%2522%253A%255B%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252210%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A10%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252225%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A25%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252250%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A50%252C%2522to%2522%253Anull%252C%2522selected%2522%253Atrue%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252270%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A70%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%255D%252C%2522prime%2522%253Atrue%252C%2522dealState%2522%253A%2522AVAILABLE%2522%252C%2522dealType%2522%253A%2522LIGHTNING_DEAL%2522%252C%2522sorting%2522%253A%2522BY_SCORE%2522%252C%2522starRating%2522%253A4%257D")
     return driver,pagelinks
 
 def get_products_link(driver,pagelinks):
