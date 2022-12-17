@@ -136,10 +136,19 @@ def scrap_page(driver, wait):
     items_links = []
     page_source = driver.page_source
     soup = BeautifulSoup(page_source, 'lxml')
-    items_list = soup.find('section', class_="styles__StyledRowWrapper-sc-z8946b-1 cvsMwU")
-    items = items_list.find_all('a', class_="Link__StyledLink-sc-frmop1-0 styles__StyledTitleLink-sc-h3r0um-1 iMNANe dcAXAu h-display-block h-text-bold h-text-bs")
+    items_links = []
+    page_source = driver.page_source
+    soup = BeautifulSoup(page_source, 'lxml')
+    items_list = soup.find('section')
+    items_list = items_list.find('div')
+    items = items_list.find_all('div')
     for item in items:
-        items_links.append('https://www.target.com'+item['href'])
+        item_urls = item.find_all('a')
+        for item_url in item_urls:
+            if item_url['href'].endswith('#lnk=sametab') :
+                if 'type=scroll_to_review_section#lnk=sametab' not in item_url['href']:
+                    items_links.append('https://www.target.com'+item_url['href'])
+    items_links=list(dict.fromkeys(items_links))
     return items_links
 
 
