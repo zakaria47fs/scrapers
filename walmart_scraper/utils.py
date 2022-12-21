@@ -3,81 +3,51 @@ import pyautogui
 import pyperclip
 import time
 import os
-import requests
+import json
 import shutil
 import logging
-from bs4 import BeautifulSoup, Comment
+from bs4 import BeautifulSoup
+import requests
+from random import randint,uniform
 import win32com.shell.shell as shell
+
 # save webpage 
 def save_page(url,file_name,page_type):
-    #proxy_rotation()
+    proxy_rotation()
+    time.sleep(uniform(1,1.5))
     logging.info('Start browser')
     webbrowser.open(url)
     time.sleep(5)
-    for i in range(0,20):
+    for i in range(0,30):
         pyautogui.press('space')
     # To simulate a Save As dialog. You can remove this since you'll be saving/downloading a file from a link
     pyautogui.hotkey('ctrl', 's')
     # Wait for the Save As dialog to load. Might need to increase the wait time on slower machines
     time.sleep(2)
     # File path + name
-    if page_type=='walmart_page':
+    if page_type=='walmart_page' :
         file_path = os.path.abspath(os.getcwd())+'\\saved_pages\\walmart_page'+f'\\{file_name}.html'
-    else :
+        pyperclip.copy(file_path)
+        pyautogui.hotkey("ctrl", "v")
+        pyautogui.hotkey("tab")
+        pyautogui.hotkey("down")
+        pyautogui.hotkey("up")
+        #Hit Enter to save
+        pyautogui.hotkey('enter')
+        pyautogui.hotkey('enter')
+        time.sleep(2)
+    elif page_type=='product_page':
         file_path = os.path.abspath(os.getcwd())+'\\saved_pages\\products_page'+f'\\{file_name}.html'
-    # Type the file path and name is Save AS dialog
-    pyperclip.copy(file_path)
-    pyautogui.hotkey("ctrl", "v")
-    #Hit Enter to save
-    pyautogui.hotkey('enter')
-    time.sleep(2)
-
-# get page number
-
-def page_num_graber():
-    file_path = os.path.abspath(os.getcwd())+'\\saved_pages\\walmart_page\\walmart_page.html'
-    soup=soup_maker(file_path)
-    try:
-        pages_num_ul=soup.find('ul',class_='list flex items-center justify-center pa0')
-        pages_num_lis=pages_num_ul.find_all('li')
-        pages_num_list = []
-        for page_num_li in pages_num_lis:
-            pages_num_list.append(page_num_li.text)
-        pages_num=[]
-        for page_num_list in pages_num_list:
-            try:
-                pages_num.append(int(page_num_list))
-            except:
-                pass
-        pages_num = max(pages_num)
-    except:
-        pages_num = 1
-    return pages_num
-
-# get page links
-
-def pages_links_graber(pages_num):
-    pages_links=[]
-    page_num = 1
-    while page_num <= pages_num :
-        pages_links.append(f'https://www.walmart.com/shop/deals/trending-flash-picks?affinityOverride=default&page={page_num}')
-        page_num+=1
-    return pages_links
-
-# parse page
-
-def soup_maker(file_path):
-    # Opening the html file
-    HTMLFile = open(file_path,encoding="utf8")
-
-    # Reading the file
-    index = HTMLFile.read()
-
-    # Creating a BeautifulSoup object and specifying the parser
-    soup = BeautifulSoup(index, 'lxml')
-    return soup
-
-# create / delete directory
+        # Type the file path and name is Save AS dialog
+        pyperclip.copy(file_path)
+        pyautogui.hotkey("ctrl", "v")
+        pyautogui.hotkey("tab")
+        pyautogui.hotkey("down")
+        pyautogui.hotkey("up")
+        #Hit Enter to save
+        pyautogui.hotkey('enter')
+        pyautogui.hotkey('enter')
+        time.sleep(2)
 
 def create_dire(page_type):
     path = os.path.abspath(os.getcwd())
@@ -98,13 +68,10 @@ def create_dire(page_type):
         # directory already exists
         pass
     
-# product info
-
 def product_scraper(file_path):
     soup=soup_maker(file_path)
-    comments = soup.find_all(string=lambda text: isinstance(text, Comment))
     try:
-        link_url = 'https:'+comments[0].split('https:')[1]
+        link_url = soup.find("meta",property="og:url")['content']
     except:
         link_url =''
     try:
@@ -125,7 +92,9 @@ def product_scraper(file_path):
     except:
         old_price = ''
     try:
-        description = soup.find('div',class_="dangerous-html mb3").get_text().replace('Description','').replace(' ','').replace('\xa0','')
+        txt = soup.find('head').find_all('script')
+        data = json.loads(txt[2].get_text())
+        description = data["description"].replace('<br>','').replace('<b>','').replace('<p>','').replace('<strong>','')
         description = description[:350]
     except:
         description =''
@@ -137,10 +106,7 @@ def product_scraper(file_path):
         primary_category = ''
         sub_category = ''
     try:
-        thumbnail = soup.find('img',class_='noselect db')['src']
-        thumbnail = soup.find('img',class_='noselect db')['src']
-        thumbnail = thumbnail.replace('./product_page_files/','').replace('(1)','')
-        thumbnail = 'https://i5.walmartimages.com/asr/'+thumbnail
+        thumbnail = soup.find('img','loading'=="eager")['srcset'].split('1x,\n          ')[-1].replace(' 2x','')
     except:
         thumbnail =''
     product_data = {'primary_category': primary_category, 'sub_category': sub_category, 'product_title': product_title,
@@ -148,14 +114,40 @@ def product_scraper(file_path):
                     'thumbnail': thumbnail, 'description': description}
     return product_data
 
-# products link from pages
+def soup_maker(file_path):
+    # Opening the html file
+    HTMLFile = open(file_path,encoding="utf8")
 
-def products_link_graber(soup):
-    products = soup.find_all('a',class_='absolute w-100 h-100 z-1 hide-sibling-opacity')
-    product_links=[]
-    for product in products:
-        product_links.append(product['href'])
-    return product_links
+    # Reading the file
+    index = HTMLFile.read()
+
+    # Creating a BeautifulSoup object and specifying the parser
+    soup = BeautifulSoup(index, 'lxml')
+    return soup
+
+def pages_links_graber(max_page):
+    pages_links=[]
+    for page_num in range(1,max_page+1):
+        pages_links.append(f'https://www.walmart.com/shop/deals/trending-flash-picks?page={page_num}')
+    return pages_links
+
+def max_page_graber():
+    file_path = os.path.abspath(os.getcwd())+'\\saved_pages\\walmart_page\\walmart_page.html'  
+    soup = soup_maker(file_path)
+    next_data = soup.find(id="__NEXT_DATA__").text
+    data = json.loads(next_data)
+    max_page = data['props']['pageProps']['initialData']['searchResult']['paginationV2']['maxPage']
+    return max_page
+
+def products_links_graber(products_links):
+    file_path = os.path.abspath(os.getcwd())+'\\saved_pages\\walmart_page\\walmart_page.html'  
+    soup = soup_maker(file_path)
+    next_data = soup.find(id="__NEXT_DATA__").text
+    data = json.loads(next_data)
+    products_dic = data['props']['pageProps']['initialData']['searchResult']['itemStacks'][0]['items']
+    for product_dic in products_dic:
+        products_links.append('https://www.walmart.com/'+product_dic['canonicalUrl'])
+    return products_links
 
 # proxy roration 
 
@@ -167,11 +159,20 @@ def proxy_cmd(proxy):
 
 def proxy_rotation():
     url = "http://httpbin.org/ip"
-    proxies = []
-
-    for proxy in proxies:
+    proxies = ['185.199.229.156:7492'
+,'185.199.228.220:7300'
+,'185.199.231.45:8382'
+,'188.74.210.207:6286'
+,'188.74.183.10:8279'
+,'188.74.210.21:6100'
+,'45.155.68.129:8133'
+,'154.95.36.199:6893'
+,'45.94.47.66:8110'
+,'144.168.217.88:8780']
+    proxy = proxies[randint(0,len(proxies)-1)]
+    while 1:
         try:
-            response = requests.get(url, proxies = {"http":proxy, "https":proxy})
+            requests.get(url, proxies = {"http":proxy, "https":proxy})
             break
         except:
             pass
