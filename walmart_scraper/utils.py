@@ -11,6 +11,8 @@ import requests
 from random import randint,uniform
 import win32com.shell.shell as shell
 
+PROXY_API_KEY = "pn38574a8d73ce40pfr7fq9e2sgyfnamb8kekd4x"
+
 # save webpage 
 def save_page(url,file_name,page_type):
     proxy_rotation()
@@ -157,18 +159,17 @@ def proxy_cmd(proxy):
     command = f'netsh winhttp set proxy {proxy}'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+command)
 
+def get_proxies():
+    r = requests.get("https://proxy.webshare.io/api/proxy/list/?page=1&countries=US-FR", headers={"Authorization": PROXY_API_KEY})
+    data = r.json()
+    proxies = []
+    for proxy in data['results']:
+        proxies.append(str(proxy['proxy_address'])+':'+str(proxy['ports']['http']))
+    return proxies    
+
 def proxy_rotation():
     url = "http://httpbin.org/ip"
-    proxies = ['185.199.229.156:7492'
-,'185.199.228.220:7300'
-,'185.199.231.45:8382'
-,'188.74.210.207:6286'
-,'188.74.183.10:8279'
-,'188.74.210.21:6100'
-,'45.155.68.129:8133'
-,'154.95.36.199:6893'
-,'45.94.47.66:8110'
-,'144.168.217.88:8780']
+    proxies = get_proxies()
     proxy = proxies[randint(0,len(proxies)-1)]
     while 1:
         try:
