@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from bson import ObjectId
 from pydantic import BaseModel, Field
@@ -48,3 +48,32 @@ class UserCategory(BaseModel):
 
 class UserKeywords(BaseModel):
     keywords: str
+
+
+class MovieCertificatesObject(BaseModel):
+    US: Optional[list]
+
+
+class MovieDataObject(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    titleId: str
+    releaseDate: str
+    imageUrl: Optional[str]
+    runningTimeInMinutes: Optional[str]
+    title: Optional[str]
+    titleType: Optional[str]
+    certificates: Optional[MovieCertificatesObject]
+    genres: Optional[list]
+    plotOutlineId: Optional[str]
+    plotOutlineText: Optional[str]
+    plotSummaryId: Optional[str]
+    plotSummaryText: Optional[str]
+    plotSummaryAuthor: Optional[str]
+    videoUrl: Optional[str]
+    videoDescription: Optional[str]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+

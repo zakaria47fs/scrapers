@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 
 from services.mongo_service import MongoService
 from utils.authentication import authorize_user
-from utils.models import DataObject, PyObjectId, DataCategory, UserCategory, UserKeywords
+from utils.models import DataObject, PyObjectId, DataCategory, UserCategory, UserKeywords, MovieDataObject
 
 # logging configuration
 logging.basicConfig(filename='log_app.log',
@@ -19,6 +19,7 @@ mongo_service = MongoService()
 target_collection = 'target_db'
 amazon_collection = 'amazon_db'
 walmart_collection = 'walmart_db'
+rapidapi_om_collection = 'rapidapi_om_db'
 
 
 @app.get("/target/deals", response_model=List[DataObject], tags=['Target'])
@@ -127,3 +128,39 @@ def get_product_category(item: UserCategory, request: Request):
 def get_product_keywords(item: UserKeywords, request: Request):
     data = mongo_service.filter_by_keywords_db(walmart_collection, item.keywords)
     return list(data)
+
+
+@app.get("/movie/comingsoon", response_model=List[MovieDataObject], tags=['Movies'])
+@authorize_user
+def get_deals(request: Request, skip: int = 0, limit: int = 0):
+    data = mongo_service.get_all_db(rapidapi_om_collection, skip, limit)
+    return list(data)
+
+
+@app.get("/movie/{id_item}", response_model=MovieDataObject, tags=['Movies'])
+@authorize_user
+def get_product_id(id_item, request: Request):
+    data = mongo_service.get_one_db(rapidapi_om_collection, PyObjectId(id_item))
+    return data
+
+
+# @app.get("/movie/categories", response_model=List[DataCategory], tags=['Movies'])
+# @authorize_user
+# def get_categories(request: Request):
+#     data = mongo_service.get_all_cat_db(rapidapi_om_collection)
+#     return list(data)
+
+
+# @app.post("/movie/products_category", response_model=List[DataObject], tags=['Movies'])
+# @authorize_user
+# def get_product_category(item: UserCategory, request: Request):
+#     filter_ = {"primary_category": {"$in": item.categories}}
+#     data = mongo_service.filter_data_db(rapidapi_om_collection, filter_)
+#     return list(data)
+
+
+# @app.post("/movie/products_keyword", response_model=List[DataObject], tags=['Movies'])
+# @authorize_user
+# def get_product_keywords(item: UserKeywords, request: Request):
+#     data = mongo_service.filter_by_keywords_db(rapidapi_om_collection, item.keywords)
+#     return list(data)

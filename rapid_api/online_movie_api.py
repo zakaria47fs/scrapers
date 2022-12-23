@@ -1,33 +1,34 @@
-import requests
+from tqdm import tqdm
+
+from objects import Movie
+from utils import get_coming_movies, get_movie_details, movie_video, get_video_url
+from services.mongo_service import MongoService
 
 
-headers = {
-	"X-RapidAPI-Key": "cbd430dda1mshdd55098ba37c2c2p148de6jsn046f5815a484",
-	"X-RapidAPI-Host": "online-movie-database.p.rapidapi.com"
-}
+mongo_service = MongoService()
+collection_name = 'rapidapi_om_db'
 
-om_endpoints = {
-    "get-coming-soon-movies": "https://online-movie-database.p.rapidapi.com/title/get-coming-soon-movies",
-    "get-overview-details": "https://online-movie-database.p.rapidapi.com/title/get-overview-details",
-    "get-videos": "https://online-movie-database.p.rapidapi.com/title/get-videos",
-    "get-video-playback": "https://online-movie-database.p.rapidapi.com/title/get-video-playback"
-}
-
-
-
-
-def get_video_url(video_id):
-    querystring = {"viconst": video_id}
-    response = requests.request("GET", om_endpoints['get-video-playback'], headers=headers, params=querystring)
-    video_urls = [item['playUrl'] for item in response.json().get('resource').get('encodings') if item['definition']=='SD']
-    if video_urls:
-        return video_urls[0]
-    return ''
-
-
-
-if __name__=='__main__':
-    querystring = {"currentCountry":"US","purchaseCountry":"US","homeCountry":"US"}
-    response = requests.request("GET", om_endpoints['get-coming-soon-movies'], headers=headers, params=querystring)
-    titles = [{'title_id': title.get('id').split('/')[-2], 'releaseDate': title.get('releaseDate')} for title in response.json()]
-    
+if __name__ == '__main__':
+    results = get_coming_movies()
+    for res in tqdm(results):
+        MovieObj = Movie(titleId=res.get('id').split('/')[-2], releaseDate=res.get('releaseDate'))
+        #movie overview details
+        movie_details = get_movie_details(title_id=MovieObj.titleId)
+        MovieObj.imageUrl = movie_details.get('title').get('image').get('url')
+        MovieObj.runningTimeInMinutes = movie_details.get('title').get('runningTimeInMinutes')
+        MovieObj.title = movie_details.get('title').get('title')
+        MovieObj.titleType = movie_details.get('title').get('titleType')
+        MovieObj.certificates = movie_details.get('certificates')
+        MovieObj.genres = movie_details.get('genres')
+        MovieObj.plotOutlineId = movie_details.get('plotOutline', {}).get('id')
+        MovieObj.plotOutlineText = movie_details.get('plotOutline', {}).get('text')
+        MovieObj.plotSummaryId = movie_details.get('plotSummary', {}).get('id')
+        MovieObj.plotSummaryText = movie_details.get('plotSummary', {}).get('text')
+        MovieObj.plotSummaryAuthor = movie_details.get('plotSummary', {}).get('author')
+        #movie videos
+        video = movie_video(title_id=MovieObj.titleId)
+        if video:
+            MovieObj.videoDescription = video.get('description', '')
+            MovieObj.videoUrl = get_video_url(video_id=video.get('id').split('/')[-1])
+        #save to db
+        mongo_service.update_by_field(collection_name, 'titleId', MovieObj.data())
