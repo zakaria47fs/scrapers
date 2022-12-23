@@ -121,3 +121,4 @@ Pipfile.lock
 # Avoid sending saved_pages
 walmart_scraper/saved_pages
 *.ipynb
+*.log
