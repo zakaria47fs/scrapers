@@ -50,6 +50,10 @@ class MongoService:
         self._database[collection_name].create_index([("product_title", "text"), ("description", "text")])
         return self._database[collection_name].find({"$text": {"$search": keywords}})
 
+    def filter_movies_by_keywords_db(self, collection_name, skip, limit, keywords):
+        self._database[collection_name].create_index([("title","text"), ("titleType","text"), ("plotOutlineText","text"), ("videoDescription","text")])
+        return self._database[collection_name].find({"$text": {"$search": keywords}}).skip(skip).limit(limit)
+
     def update_by_link(self, collection_name, data):
         self._database[collection_name].update_one(
             {"link_url": data.get('link_url')},

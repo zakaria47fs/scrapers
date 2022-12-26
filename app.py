@@ -147,9 +147,12 @@ def get_product_keywords(item: UserKeywords, request: Request):
 
 @app.get("/movie/comingsoon", response_model=List[MovieDataObject], tags=['Movies'])
 @authorize_user
-def get_deals(request: Request, skip: int = 0, limit: int = 0):
+def get_deals(request: Request, skip: int = 0, limit: int = 0, keywords: str = ''):
     logging.info(f"{request.method} {request.url}")
-    data = mongo_service.get_all_db(rapidapi_om_collection, skip, limit)
+    if keywords:
+        data = mongo_service.filter_movies_by_keywords_db(rapidapi_om_collection, skip, limit, keywords)
+    else:
+        data = mongo_service.get_all_db(rapidapi_om_collection, skip, limit)
     return list(data)
 
 
