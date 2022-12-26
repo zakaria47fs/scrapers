@@ -1,5 +1,7 @@
 from base64 import b64decode
 from functools import wraps
+import logging
+import sys
 
 from Crypto.PublicKey import RSA
 from fastapi import HTTPException
@@ -31,7 +33,9 @@ def authorize_user(f):
             if public_key == pub_key.decode("utf-8"):
                 return f(*args, **kwargs)
             else:
+                logging.exception(e)
                 raise HTTPException(status_code=405, detail="Not authorized")
-        except:
+        except Exception as e:
+            logging.exception(e)
             raise HTTPException(status_code=405, detail="Not authorized")
     return decorator

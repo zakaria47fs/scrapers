@@ -25,6 +25,7 @@ rapidapi_om_collection = 'rapidapi_om_db'
 @app.get("/target/deals", response_model=List[DataObject], tags=['Target'])
 @authorize_user
 def get_deals(request: Request, skip: int = 0, limit: int = 0):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_all_db(target_collection, skip, limit)
     return list(data)
 
@@ -32,6 +33,7 @@ def get_deals(request: Request, skip: int = 0, limit: int = 0):
 @app.get("/target/products/{id_item}", response_model=DataObject, tags=['Target'])
 @authorize_user
 def get_product_id(id_item, request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_one_db(target_collection, PyObjectId(id_item))
     return data
 
@@ -39,6 +41,7 @@ def get_product_id(id_item, request: Request):
 @app.get("/target/categories", response_model=List[DataCategory], tags=['Target'])
 @authorize_user
 def get_categories(request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_all_cat_db(target_collection)
     return list(data)
 
@@ -46,6 +49,7 @@ def get_categories(request: Request):
 @app.post("/target/products_category", response_model=List[DataObject], tags=['Target'])
 @authorize_user
 def get_product_category(item: UserCategory, request: Request):
+    logging.info(f"{request.method} {request.url}")
     filter_ = {"primary_category": {"$in": item.categories}}
     data = mongo_service.filter_data_db(target_collection, filter_)
     return list(data)
@@ -54,6 +58,7 @@ def get_product_category(item: UserCategory, request: Request):
 @app.post("/target/products_keyword", response_model=List[DataObject], tags=['Target'])
 @authorize_user
 def get_product_keywords(item: UserKeywords, request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.filter_by_keywords_db(target_collection, item.keywords)
     return list(data)
 
@@ -61,6 +66,7 @@ def get_product_keywords(item: UserKeywords, request: Request):
 @app.get("/amazon/deals", response_model=List[DataObject], tags=['Amazon'])
 @authorize_user
 def get_deals(request: Request, skip: int = 0, limit: int = 0):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_all_db(amazon_collection, skip, limit)
     return list(data)
 
@@ -68,6 +74,7 @@ def get_deals(request: Request, skip: int = 0, limit: int = 0):
 @app.get("/amazon/products/{id_item}", response_model=DataObject, tags=['Amazon'])
 @authorize_user
 def get_product_id(id_item, request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_one_db(amazon_collection, PyObjectId(id_item))
     return data
 
@@ -75,6 +82,7 @@ def get_product_id(id_item, request: Request):
 @app.get("/amazon/categories", response_model=List[DataCategory], tags=['Amazon'])
 @authorize_user
 def get_categories(request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_all_cat_db(amazon_collection)
     return list(data)
 
@@ -82,6 +90,7 @@ def get_categories(request: Request):
 @app.post("/amazon/products_category", response_model=List[DataObject], tags=['Amazon'])
 @authorize_user
 def get_product_category(item: UserCategory, request: Request):
+    logging.info(f"{request.method} {request.url}")
     filter_ = {"primary_category": {"$in": item.categories}}
     data = mongo_service.filter_data_db(amazon_collection, filter_)
     return list(data)
@@ -90,6 +99,7 @@ def get_product_category(item: UserCategory, request: Request):
 @app.post("/amazon/products_keyword", response_model=List[DataObject], tags=['Amazon'])
 @authorize_user
 def get_product_keywords(item: UserKeywords, request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.filter_by_keywords_db(amazon_collection, item.keywords)
     return list(data)
 
@@ -97,6 +107,7 @@ def get_product_keywords(item: UserKeywords, request: Request):
 @app.get("/walmart/deals", response_model=List[DataObject], tags=['Walmart'])
 @authorize_user
 def get_deals(request: Request, skip: int = 0, limit: int = 0):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_all_db(walmart_collection, skip, limit)
     return list(data)
 
@@ -104,6 +115,7 @@ def get_deals(request: Request, skip: int = 0, limit: int = 0):
 @app.get("/walmart/products/{id_item}", response_model=DataObject, tags=['Walmart'])
 @authorize_user
 def get_product_id(id_item, request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_one_db(walmart_collection, PyObjectId(id_item))
     return data
 
@@ -111,6 +123,7 @@ def get_product_id(id_item, request: Request):
 @app.get("/walmart/categories", response_model=List[DataCategory], tags=['Walmart'])
 @authorize_user
 def get_categories(request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_all_cat_db(walmart_collection)
     return list(data)
 
@@ -118,6 +131,7 @@ def get_categories(request: Request):
 @app.post("/walmart/products_category", response_model=List[DataObject], tags=['Walmart'])
 @authorize_user
 def get_product_category(item: UserCategory, request: Request):
+    logging.info(f"{request.method} {request.url}")
     filter_ = {"primary_category": {"$in": item.categories}}
     data = mongo_service.filter_data_db(walmart_collection, filter_)
     return list(data)
@@ -126,6 +140,7 @@ def get_product_category(item: UserCategory, request: Request):
 @app.post("/walmart/products_keyword", response_model=List[DataObject], tags=['Walmart'])
 @authorize_user
 def get_product_keywords(item: UserKeywords, request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.filter_by_keywords_db(walmart_collection, item.keywords)
     return list(data)
 
@@ -133,6 +148,7 @@ def get_product_keywords(item: UserKeywords, request: Request):
 @app.get("/movie/comingsoon", response_model=List[MovieDataObject], tags=['Movies'])
 @authorize_user
 def get_deals(request: Request, skip: int = 0, limit: int = 0):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_all_db(rapidapi_om_collection, skip, limit)
     return list(data)
 
@@ -140,6 +156,7 @@ def get_deals(request: Request, skip: int = 0, limit: int = 0):
 @app.get("/movie/{id_item}", response_model=MovieDataObject, tags=['Movies'])
 @authorize_user
 def get_product_id(id_item, request: Request):
+    logging.info(f"{request.method} {request.url}")
     data = mongo_service.get_one_db(rapidapi_om_collection, PyObjectId(id_item))
     return data
 
