@@ -10,6 +10,8 @@ from bs4 import BeautifulSoup
 import requests
 from random import randint,uniform
 import win32com.shell.shell as shell
+from datetime import datetime
+
 
 PROXY_API_KEY = "pn38574a8d73ce40pfr7fq9e2sgyfnamb8kekd4x"
 
@@ -113,7 +115,7 @@ def product_scraper(file_path):
         thumbnail =''
     product_data = {'primary_category': primary_category, 'sub_category': sub_category, 'product_title': product_title,
                     'product_brand': product_brand, 'old_price': old_price,'new_price': new_price, 'link_url': link_url,
-                    'thumbnail': thumbnail, 'description': description}
+                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now()}
     return product_data
 
 def soup_maker(file_path):

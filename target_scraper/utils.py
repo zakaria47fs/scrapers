@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import logging
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 
 def open_browser(driver_path):
@@ -126,7 +127,7 @@ def product_get_info(driver, wait, primary_category, sub_category):
     
     product_info = {'primary_category': primary_category, 'sub_category': sub_category, 'product_title': product_title,
                     'product_brand': product_brand, 'old_price': old_price,'new_price': new_price, 'link_url': link_url,
-                    'thumbnail': thumbnail, 'description': description}
+                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now()}
 
     return product_info
 

@@ -1,11 +1,12 @@
 import logging
 from typing import List
-
+from datetime import datetime, timedelta
 from fastapi import FastAPI, Request
 
 from services.mongo_service import MongoService
 from utils.authentication import authorize_user
 from utils.models import DataObject, PyObjectId, DataCategory, UserCategory, UserKeywords, MovieDataObject
+
 
 # logging configuration
 logging.basicConfig(filename='log_app.log',
@@ -21,12 +22,17 @@ amazon_collection = 'amazon_db'
 walmart_collection = 'walmart_db'
 rapidapi_om_collection = 'rapidapi_om_db'
 
+yesterday_date = (datetime.now() - timedelta(1)).replace(hour=0, minute=0, second=0, microsecond=0)
+week_date = (datetime.now() - timedelta(7)).replace(hour=0, minute=0, second=0, microsecond=0)
+
 
 @app.get("/target/deals", response_model=List[DataObject], tags=['Target'])
 @authorize_user
 def get_deals(request: Request, skip: int = 0, limit: int = 0):
     logging.info(f"{request.method} {request.url}")
-    data = mongo_service.get_all_db(target_collection, skip, limit)
+    #data = mongo_service.get_all_db(target_collection, skip, limit)
+    filter_ = {"created_at": {"$gte": week_date}}
+    data = mongo_service.filter_data_db(target_collection, skip, limit, filter_)
     return list(data)
 
 
@@ -67,7 +73,8 @@ def get_product_keywords(item: UserKeywords, request: Request):
 @authorize_user
 def get_deals(request: Request, skip: int = 0, limit: int = 0):
     logging.info(f"{request.method} {request.url}")
-    data = mongo_service.get_all_db(amazon_collection, skip, limit)
+    filter_ = {"created_at": {"$gte": yesterday_date}}
+    data = mongo_service.filter_data_db(amazon_collection, skip, limit, filter_)
     return list(data)
 
 
@@ -108,7 +115,8 @@ def get_product_keywords(item: UserKeywords, request: Request):
 @authorize_user
 def get_deals(request: Request, skip: int = 0, limit: int = 0):
     logging.info(f"{request.method} {request.url}")
-    data = mongo_service.get_all_db(walmart_collection, skip, limit)
+    filter_ = {"created_at": {"$gte": week_date}}
+    data = mongo_service.filter_data_db(walmart_collection, skip, limit, filter_)
     return list(data)
 
 

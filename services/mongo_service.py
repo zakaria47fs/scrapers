@@ -43,8 +43,8 @@ class MongoService:
     def remove_one_db(self, collection_name, profile_id):
         self._database[collection_name].delete_one({"_id": profile_id})
 
-    def filter_data_db(self, collection_name, filter):
-        return self._database[collection_name].find(filter)
+    def filter_data_db(self, collection_name, skip, limit, filter):
+        return self._database[collection_name].find(filter).skip(skip).limit(limit)
 
     def filter_by_keywords_db(self, collection_name, keywords):
         self._database[collection_name].create_index([("product_title", "text"), ("description", "text")])
