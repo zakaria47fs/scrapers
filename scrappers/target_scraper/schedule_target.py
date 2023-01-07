@@ -6,7 +6,7 @@ from datetime import datetime
 def run_main():
     exec(open("main.py").read())
 
-schedule.every().day.at('00:00').do(run_main)
+schedule.every().day.at('08:00').do(run_main)
 
 while 1:
     schedule.run_pending()
