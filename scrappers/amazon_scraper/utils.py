@@ -4,8 +4,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+from pytz import timezone
 
+TZ_EST = timezone('EST')
 
 def get_product_data(driver):
     page_source = driver.page_source
@@ -97,9 +99,19 @@ def get_product_data(driver):
     except:
         primary_category = ''
         sub_category = ''
+
+    expiry_date = (datetime.now(TZ_EST) + timedelta(1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    try:
+        discount_percent = round((1-float(new_price)/float(old_price))*100)
+        if not 0<discount_percent<100:
+            raise ValueError
+    except:
+        discount_percent = None
+
     product_info = {'primary_category': primary_category, 'sub_category': sub_category, 'product_title': product_title,
                     'product_brand': product_brand, 'old_price': old_price,'new_price': new_price, 'link_url': link_url,
-                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now()}
+                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now(), 'expiry_date': expiry_date,
+                    'discount_percent': f'{discount_percent}%'}
     return driver,product_info
 
 def get_pages_link(driver):

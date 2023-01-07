@@ -10,9 +10,10 @@ from bs4 import BeautifulSoup
 import requests
 from random import randint,uniform
 import win32com.shell.shell as shell
-from datetime import datetime
+from datetime import datetime, timedelta
+from pytz import timezone
 
-
+TZ_EST = timezone('EST')
 PROXY_API_KEY = "pn38574a8d73ce40pfr7fq9e2sgyfnamb8kekd4x"
 
 # save webpage 
@@ -113,9 +114,19 @@ def product_scraper(file_path):
         thumbnail = soup.find('img','loading'=="eager")['srcset'].split('1x,\n          ')[-1].replace(' 2x','')
     except:
         thumbnail =''
+
+    expiry_date = (datetime.now(TZ_EST) + timedelta(1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    try:
+        discount_percent = round((1-float(new_price)/float(old_price))*100)
+        if not 0<discount_percent<100:
+            raise ValueError
+    except:
+        discount_percent = None
+
     product_data = {'primary_category': primary_category, 'sub_category': sub_category, 'product_title': product_title,
                     'product_brand': product_brand, 'old_price': old_price,'new_price': new_price, 'link_url': link_url,
-                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now()}
+                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now(), 'expiry_date': expiry_date,
+                    'discount_percent': f'{discount_percent}%'}
     return product_data
 
 def soup_maker(file_path):
