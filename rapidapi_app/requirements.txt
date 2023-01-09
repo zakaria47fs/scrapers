@@ -1,0 +1,9 @@
+selenium
+beautifulsoup4
+lxml
+pymongo
+"pymongo[srv]"
+fastapi
+uvicorn
+pycryptodome
+pytz
