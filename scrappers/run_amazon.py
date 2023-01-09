@@ -9,7 +9,7 @@ from services.mongo_service import MongoService
 logging.basicConfig(filename='amazon_scraper/log_app.log',
                     format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p',
-                    level=logging.DEBUG)
+                    level=logging.INFO)
 
 mongo_service = MongoService()
 collection_name = 'amazon_db'
