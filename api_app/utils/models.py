@@ -31,6 +31,8 @@ class DataObject(BaseModel):
     link_url: str
     thumbnail: str
     description: str
+    expiry_date: Optional[str]
+    discount_percent: Optional[str]
 
     class Config:
         allow_population_by_field_name = True

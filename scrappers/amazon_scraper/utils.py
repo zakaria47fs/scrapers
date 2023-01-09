@@ -100,7 +100,8 @@ def get_product_data(driver):
         primary_category = ''
         sub_category = ''
 
-    expiry_date = (datetime.now(TZ_EST) + timedelta(1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    expiry_date = None
+    #expiry_date = (datetime.now(TZ_EST) + timedelta(1)).replace(hour=0, minute=0, second=0, microsecond=0)
     try:
         discount_percent = round((1-float(new_price)/float(old_price))*100)
         if not 0<discount_percent<100:

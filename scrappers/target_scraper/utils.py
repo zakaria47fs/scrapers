@@ -127,7 +127,11 @@ def product_get_info(driver, wait, primary_category, sub_category):
     except:
         thumbnail =''
 
-    expiry_date = (datetime.now(TZ_EST) + timedelta(6)).replace(hour=0, minute=0, second=0, microsecond=0)
+    #The ad is updated every Sunday between midnight and 2 a.m. Central time
+    #https://help.target.com/help/subcategoryarticle?childcat=Weekly+Ad&parentcat=Promotions+%26+Coupons&searchQuery=search+help
+    today = datetime.now(TZ_EST)
+    sunday = today + timedelta( (6-today.weekday()) % 7 )
+    expiry_date = sunday.replace(hour=1, minute=0, second=0, microsecond=0)
     try:
         discount_percent = round((1-float(new_price)/float(old_price))*100)
         if not 0<discount_percent<100:
