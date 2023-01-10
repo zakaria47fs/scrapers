@@ -1,7 +1,7 @@
 from typing import List, Optional
-
 from bson import ObjectId
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 
 class PyObjectId(ObjectId):
@@ -31,7 +31,7 @@ class DataObject(BaseModel):
     link_url: str
     thumbnail: str
     description: str
-    expiry_date: Optional[str]
+    expiry_date: Optional[datetime]
     discount_percent: Optional[str]
 
     class Config:
