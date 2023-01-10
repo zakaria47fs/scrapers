@@ -17,6 +17,8 @@ collection_name = 'rapidapi_om_db'
 if __name__ == '__main__':
     logging.info('Running rm rapid api!')
     results = get_coming_movies()
+    # remove expired movies
+    mongo_service.drop_collection(collection_name)
     for res in tqdm(results):
         MovieObj = Movie(titleId=res.get('id').split('/')[-2], releaseDate=res.get('releaseDate'))
         #movie overview details

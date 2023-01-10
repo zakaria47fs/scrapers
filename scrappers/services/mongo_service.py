@@ -46,6 +46,9 @@ class MongoService:
     def remove_one_db(self, collection_name, profile_id):
         self._database[collection_name].delete_one({"_id": profile_id})
 
+    def remove_many_db(self, collection_name, filter):
+        self._database[collection_name].delete_many(filter)
+
     def filter_data_db(self, collection_name, skip, limit, filter):
         return self._database[collection_name].find(filter).skip(skip).limit(limit)
 
@@ -70,3 +73,6 @@ class MongoService:
             {"$set": data},
             upsert=True
         )
+
+    def drop_collection(self, collection_name):
+        self._database.drop_collection(collection_name)

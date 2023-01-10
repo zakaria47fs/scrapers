@@ -127,7 +127,7 @@ def product_scraper(file_path):
 
     product_data = {'primary_category': primary_category, 'sub_category': sub_category, 'product_title': product_title,
                     'product_brand': product_brand, 'old_price': old_price,'new_price': new_price, 'link_url': link_url,
-                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now(), 'expiry_date': expiry_date,
+                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now(TZ_EST), 'expiry_date': expiry_date,
                     'discount_percent': discount_percent}
     return product_data
 

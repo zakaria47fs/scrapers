@@ -1,9 +1,9 @@
 import pyautogui
 import os
-from walmart_scraper.utils import create_dire,save_page,max_page_graber,pages_links_graber,products_links_graber,product_scraper
+from walmart_scraper.utils import create_dire,save_page,max_page_graber,pages_links_graber,products_links_graber,product_scraper, TZ_EST
 import logging
 from services.mongo_service import MongoService
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 
 pyautogui.FAILSAFE = False
@@ -18,6 +18,7 @@ collection_name = 'walmart_db'
 
 if __name__=='__main__':
     logging.info(f"Start time : {datetime.now()}")
+
     create_dire('walmart_page')
     products_links = []
     while 1:

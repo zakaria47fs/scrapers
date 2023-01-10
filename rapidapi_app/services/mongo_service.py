@@ -46,6 +46,9 @@ class MongoService:
     def remove_one_db(self, collection_name, profile_id):
         self._database[collection_name].delete_one({"_id": profile_id})
 
+    def remove_many_db(self, collection_name, filter):
+        self._database[collection_name].delete_many(filter)
+
     def filter_data_db(self, collection_name, skip, limit, filter):
         return self._database[collection_name].find(filter).skip(skip).limit(limit)
 
@@ -53,12 +56,9 @@ class MongoService:
         self._database[collection_name].create_index([("product_title", "text"), ("description", "text")])
         return self._database[collection_name].find({"$text": {"$search": keywords}})
 
-    def filter_movies_by_keywords_db(self, collection_name, skip, limit, keywords, filters={}):
+    def filter_movies_by_keywords_db(self, collection_name, skip, limit, keywords):
         self._database[collection_name].create_index([("title","text"), ("titleType","text"), ("plotOutlineText","text"), ("videoDescription","text")])
-        filter_search = {"$text": {"$search": keywords}}
-        if filters:
-            filter_search.update(filters)
-        return self._database[collection_name].find(filter_search).skip(skip).limit(limit)
+        return self._database[collection_name].find({"$text": {"$search": keywords}}).skip(skip).limit(limit)
 
     def update_by_link(self, collection_name, data):
         self._database[collection_name].update_one(
@@ -73,3 +73,6 @@ class MongoService:
             {"$set": data},
             upsert=True
         )
+
+    def drop_collection(self, collection_name):
+        self._database.drop_collection(collection_name)

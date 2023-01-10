@@ -2,10 +2,13 @@ import logging
 from typing import List
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Request
+from pytz import timezone
+import threading
 
 from services.mongo_service import MongoService
 from utils.authentication import authorize_user
 from utils.models import DataObject, PyObjectId, DataCategory, UserCategory, UserKeywords, MovieDataObject
+from utils.utils import clear_expired_deals
 
 
 # logging configuration
@@ -22,8 +25,9 @@ amazon_collection = 'amazon_db'
 walmart_collection = 'walmart_db'
 rapidapi_om_collection = 'rapidapi_om_db'
 
-yesterday_date = (datetime.now() - timedelta(1)).replace(hour=0, minute=0, second=0, microsecond=0)
-week_date = (datetime.now() - timedelta(7)).replace(hour=0, minute=0, second=0, microsecond=0)
+TZ_EST = timezone('EST')
+yesterday_date = (datetime.now(TZ_EST) - timedelta(1)).replace(hour=1, minute=0, second=0, microsecond=0)
+week_date = (datetime.now(TZ_EST) - timedelta(7)).replace(hour=1, minute=0, second=0, microsecond=0)
 
 
 @app.get("/target/deals", response_model=List[DataObject], tags=['Target'])
@@ -173,23 +177,8 @@ def get_product_id(id_item, request: Request):
     return data
 
 
-# @app.get("/movie/categories", response_model=List[DataCategory], tags=['Movies'])
-# @authorize_user
-# def get_categories(request: Request):
-#     data = mongo_service.get_all_cat_db(rapidapi_om_collection)
-#     return list(data)
-
-
-# @app.post("/movie/products_category", response_model=List[DataObject], tags=['Movies'])
-# @authorize_user
-# def get_product_category(item: UserCategory, request: Request):
-#     filter_ = {"primary_category": {"$in": item.categories}}
-#     data = mongo_service.filter_data_db(rapidapi_om_collection, filter_)
-#     return list(data)
-
-
-# @app.post("/movie/products_keyword", response_model=List[DataObject], tags=['Movies'])
-# @authorize_user
-# def get_product_keywords(item: UserKeywords, request: Request):
-#     data = mongo_service.filter_by_keywords_db(rapidapi_om_collection, item.keywords)
-#     return list(data)
+# thread to clear expired deals
+@app.on_event("startup")
+async def startup_event():
+    thread = threading.Thread(target=clear_expired_deals)
+    thread.start()

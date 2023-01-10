@@ -1,9 +1,9 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from target_scraper.utils import get_category_links, get_eligible_links, get_page_links, scrap_page, open_browser, product_get_info
+from target_scraper.utils import get_category_links, get_eligible_links, get_page_links, scrap_page, open_browser, product_get_info, TZ_EST
 from services.mongo_service import MongoService
 
 
@@ -23,6 +23,7 @@ driver, wait = open_browser(driver_path='chromedriver --max_old_space_size=4096'
 
 if __name__=='__main__':
     logging.info(f"Start time : {datetime.now()}")
+
     #Scraping Categories Links And filling Category_links ARRAY  
     category_links = get_category_links(driver, wait)
     all_item_links = []
