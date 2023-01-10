@@ -112,7 +112,7 @@ def get_product_data(driver):
 
     product_info = {'primary_category': primary_category, 'sub_category': sub_category, 'product_title': product_title,
                     'product_brand': product_brand, 'old_price': old_price,'new_price': new_price, 'link_url': link_url,
-                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now(TZ_EST), 'expiry_date': expiry_date,
+                    'thumbnail': thumbnail, 'description': description, 'created_at': datetime.now(), 'expiry_date': expiry_date,
                     'discount_percent': discount_percent}
     return driver,product_info
 
@@ -122,8 +122,10 @@ def get_pages_link(driver):
     pagenum = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH,"/html/body/div[1]/div[21]/div/div/div/div[3]/div/ul/li[2]")))
     pagenum = pagenum.get_attribute("aria-label")
     pagenum = int(pagenum.split('of ')[-1])
+    url = driver.current_url
+    url_parts = url.split("viewIndex%2522%253A")
     for i in range(pagenum):
-        pagelinks.append(f"https://www.amazon.com/deals?ref_=nav_cs_gb&deals-widget=%257B%2522version%2522%253A1%252C%2522viewIndex%2522%253A{60*i}%252C%2522presetId%2522%253A%2522AB48D68973BA06D9DFD05723DA760601%2522%252C%2522discountRanges%2522%253A%255B%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252210%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A10%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252225%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A25%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252250%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A50%252C%2522to%2522%253Anull%252C%2522selected%2522%253Atrue%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252270%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A70%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%255D%252C%2522prime%2522%253Atrue%252C%2522dealState%2522%253A%2522AVAILABLE%2522%252C%2522dealType%2522%253A%2522LIGHTNING_DEAL%2522%252C%2522sorting%2522%253A%2522BY_SCORE%2522%252C%2522starRating%2522%253A4%257D")
+        pagelinks.append(url_parts[0]+'viewIndex%2522%253A'+str(60*i)+url_parts[1][1:])
     return driver,pagelinks
 
 def get_products_link(driver,pagelinks):
@@ -138,24 +140,16 @@ def get_products_link(driver,pagelinks):
             productslinks.append(products_link['href'])
     return driver,productslinks
 
-
 def open_browser(driver_path):
     logging.info('Start browser')
     options = wd.ChromeOptions()
     #options.add_argument('--headless')
     driver = wd.Chrome(driver_path, chrome_options=options)
-    url = "https://www.amazon.com/deals?ref_=nav_cs_gb&deals-widget=%257B%2522version%2522%253A1%252C%2522viewIndex%2522%253A0%252C%2522presetId%2522%253A%2522AB48D68973BA06D9DFD05723DA760601%2522%252C%2522discountRanges%2522%253A%255B%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252210%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A10%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252225%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A25%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252250%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A50%252C%2522to%2522%253Anull%252C%2522selected%2522%253Atrue%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252270%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A70%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%255D%252C%2522prime%2522%253Atrue%252C%2522dealState%2522%253A%2522AVAILABLE%2522%252C%2522dealType%2522%253A%2522LIGHTNING_DEAL%2522%252C%2522sorting%2522%253A%2522BY_SCORE%2522%252C%2522starRating%2522%253A4%257D"
+    url = "https://www.amazon.com"
     driver.get(url)
     driver.maximize_window()
-    try:
-        lightning_deals = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH,"//*[text()='Lightning Deals']")))
-        lightning_deals.click()
-        available = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.CSS_SELECTOR,"#grid-main-container > div.GridFilters-module__gridFilterSection_36xNFAVppWfx4i4otzVc2Y > span:nth-child(2) > ul > li:nth-child(2) > div > a")))
-        available.click()
-        discount50 = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.CSS_SELECTOR,"#grid-main-container > div.GridFilters-module__gridFilterSection_36xNFAVppWfx4i4otzVc2Y > span:nth-child(4) > ul > li:nth-child(4) > div > a")))
-        discount50.click()
-        review = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.CSS_SELECTOR,"#grid-main-container > div.GridFilters-module__gridFilterSection_36xNFAVppWfx4i4otzVc2Y > span:nth-child(5) > ul > li:nth-child(1) > div > a")))
-        review.click()
-    except:
-        pass
+    todaysdeals = driver.find_element(By.XPATH,"/html/body/div[1]/header/div/div[4]/div[2]/div[2]/div/a[6]")
+    filters ='&deals-widget=%257B%2522version%2522%253A1%252C%2522viewIndex%2522%253A0%252C%2522presetId%2522%253A%2522AE6BA37878475F9AE4C584B7AD5E12BE%2522%252C%2522discountRanges%2522%253A%255B%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252210%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A10%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252225%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A25%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252250%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A50%252C%2522to%2522%253Anull%252C%2522selected%2522%253Atrue%257D%252C%257B%2522sectionText%2522%253A%2522Discount%2522%252C%2522optionText%2522%253A%252270%2525%2520off%2520or%2520more%2522%252C%2522from%2522%253A70%252C%2522to%2522%253Anull%252C%2522selected%2522%253Afalse%257D%255D%252C%2522prime%2522%253Atrue%252C%2522dealType%2522%253A%2522LIGHTNING_DEAL%2522%252C%2522sorting%2522%253A%2522BY_SCORE%2522%252C%2522starRating%2522%253A4%257D'
+    url = todaysdeals.get_attribute('href')+filters
+    driver.get(url)
     return driver
