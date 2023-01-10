@@ -26,10 +26,12 @@ if __name__=='__main__':
     driver,productslinks = get_products_link(driver,page_links)
 
     for productslink in productslinks:
+      try:
         driver.get(productslink)
         driver,product_data = get_product_data(driver)
         # push product info to DB
         mongo_service.update_by_link(collection_name, product_data)
-
+      except:
+        pass
     logging.info("End process")
     logging.info(f"End time : {datetime.now()}")
